@@ -1,4 +1,4 @@
-static INPUT: &str = include_str!("../input");
+static INPUT: &str = include_str!("../../input");
 
 fn main() {
     let sum_of_all_lines: u32 = INPUT.lines().map(get_number).sum();
