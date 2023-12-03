@@ -1,3 +1,4 @@
+use std::cmp;
 use std::str::FromStr;
 
 #[derive(Debug)]
@@ -31,6 +32,19 @@ impl FromStr for Game {
 impl Game {
     pub fn is_possible(&self, set: &Set) -> bool {
         self.sets.iter().all(|s| s.is_possible(set))
+    }
+
+    pub fn minimum_set(&self) -> Set {
+        let mut red = 0;
+        let mut green = 0;
+        let mut blue = 0;
+
+        for set in &self.sets {
+            red = cmp::max(red, set.red);
+            green = cmp::max(green, set.green);
+            blue = cmp::max(blue, set.blue);
+        }
+        Set { red, green, blue }
     }
 }
 
@@ -67,5 +81,9 @@ impl FromStr for Set {
 impl Set {
     fn is_possible(&self, set: &Set) -> bool {
         self.red <= set.red && self.green <= set.green && self.blue <= set.blue
+    }
+
+    pub fn power(&self) -> usize {
+        self.red as usize * self.green as usize * self.blue as usize
     }
 }
