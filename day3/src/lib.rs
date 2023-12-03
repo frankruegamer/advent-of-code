@@ -90,3 +90,20 @@ pub fn look_for(line: &str) -> Vec<Appearance> {
     }
     appearances
 }
+
+pub fn get_surrounding_kinds<E, F, T>(lines: &[Vec<E>], n: usize, func: F) -> Vec<&T>
+where
+    F: Fn(&E) -> Option<&T>,
+{
+    let line = &lines[n];
+    let mut numbers: Vec<_> = line.iter().filter_map(&func).collect();
+    if n > 0 {
+        if let Some(prev_line) = lines.get(n - 1) {
+            numbers.extend(prev_line.iter().filter_map(&func));
+        }
+    }
+    if let Some(next_line) = lines.get(n + 1) {
+        numbers.extend(next_line.iter().filter_map(&func));
+    }
+    numbers
+}

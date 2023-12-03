@@ -1,4 +1,4 @@
-use day3::{Appearance, Symbol};
+use day3::{get_surrounding_kinds, Appearance, Symbol};
 
 const INPUT: &str = include_str!("../../input");
 
@@ -7,15 +7,8 @@ fn main() {
 
     let mut sum: usize = 0;
     for (n, line) in lines.iter().enumerate() {
-        let mut numbers: Vec<_> = line.iter().filter_map(Appearance::as_number).collect();
-        if n > 0 {
-            if let Some(prev_line) = lines.get(n - 1) {
-                numbers.extend(prev_line.iter().filter_map(Appearance::as_number));
-            }
-        }
-        if let Some(next_line) = lines.get(n + 1) {
-            numbers.extend(next_line.iter().filter_map(Appearance::as_number));
-        }
+        let numbers = get_surrounding_kinds(&lines, n, Appearance::as_number);
+
         for appearance in line {
             if let Appearance::SymbolKind(Symbol {
                 is_gear: true,
