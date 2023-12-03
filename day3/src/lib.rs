@@ -65,7 +65,7 @@ pub struct Symbol {
     pub is_gear: bool,
 }
 
-pub fn look_for(line: &str) -> Vec<Appearance> {
+pub fn look_for_appearances(line: &str) -> Vec<Appearance> {
     let mut appearances = Vec::new();
     let mut number_builder: Option<NumberBuilder> = None;
     for (index, char) in line.chars().enumerate() {
