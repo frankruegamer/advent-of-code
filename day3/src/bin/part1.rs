@@ -9,9 +9,10 @@ fn main() {
     let mut sum: usize = 0;
     for (n, line) in lines.iter().enumerate() {
         let mut symbols: Vec<_> = line.iter().filter_map(Appearance::as_symbol).collect();
-        // TODO better check for previous line
-        if let Some(prev_line) = lines.get(n.overflowing_sub(1).0) {
-            symbols.extend(prev_line.iter().filter_map(Appearance::as_symbol));
+        if n > 0 {
+            if let Some(prev_line) = lines.get(n - 1) {
+                symbols.extend(prev_line.iter().filter_map(Appearance::as_symbol));
+            }
         }
         if let Some(next_line) = lines.get(n + 1) {
             symbols.extend(next_line.iter().filter_map(Appearance::as_symbol));

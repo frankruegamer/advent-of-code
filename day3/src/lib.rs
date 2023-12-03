@@ -13,6 +13,13 @@ impl Appearance {
             Appearance::NumberKind(_) => None,
         }
     }
+
+    pub fn as_number(&self) -> Option<&Number> {
+        match self {
+            Appearance::NumberKind(number) => Some(number),
+            Appearance::SymbolKind(_) => None,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -55,6 +62,7 @@ impl NumberBuilder {
 #[derive(Debug)]
 pub struct Symbol {
     pub index: usize,
+    pub is_gear: bool,
 }
 
 pub fn look_for(line: &str) -> Vec<Appearance> {
@@ -73,7 +81,10 @@ pub fn look_for(line: &str) -> Vec<Appearance> {
                 appearances.push(Appearance::NumberKind(number));
             }
             if char != '.' {
-                appearances.push(Appearance::SymbolKind(Symbol { index }));
+                appearances.push(Appearance::SymbolKind(Symbol {
+                    index,
+                    is_gear: char == '*',
+                }));
             }
         }
     }
