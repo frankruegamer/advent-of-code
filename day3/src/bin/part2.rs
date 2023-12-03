@@ -18,7 +18,6 @@ fn main() {
                 let numbers: Vec<_> = numbers
                     .iter()
                     .filter(|number| number.is_next_to_this_symbol(*index))
-                    .copied()
                     .collect();
 
                 if numbers.len() == 2 {
