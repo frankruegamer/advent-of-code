@@ -1,6 +1,8 @@
-static INPUT: &str = include_str!("../../input");
+const INPUT: &str = include_str!("../../input");
 
-const DIGITS: [&str; 9] = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+const DIGITS: [&str; 9] = [
+    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+];
 
 fn main() {
     let sum_of_all_lines: u32 = INPUT.lines().map(get_number).sum();
@@ -21,7 +23,9 @@ fn get_number(line: &str) -> u32 {
     let first_digit = get_first_digit(&entries);
     let last_digit = get_last_digit(&entries);
     let combined_number = format!("{}{}", first_digit, last_digit);
-    combined_number.parse().unwrap_or_else(|_| panic!("could not parse {} into a number", combined_number))
+    combined_number
+        .parse()
+        .unwrap_or_else(|_| panic!("could not parse {} into a number", combined_number))
 }
 
 fn get_digit_numbers(line: &str) -> Vec<Entry> {
@@ -29,7 +33,10 @@ fn get_digit_numbers(line: &str) -> Vec<Entry> {
     let mut last_number = None;
     for (index, c) in line.chars().enumerate() {
         if c.is_numeric() {
-            let option = Some(Entry { index, digit: format!("{}", c).parse().unwrap() });
+            let option = Some(Entry {
+                index,
+                digit: format!("{}", c).parse().unwrap(),
+            });
             if first_number.is_none() {
                 first_number = option.clone();
             }
@@ -45,19 +52,33 @@ fn get_string_numbers(line: &str) -> Vec<Entry> {
     let mut entries = vec![];
     for (digit, string) in DIGITS.iter().enumerate() {
         if let Some(index) = line.find(string) {
-            entries.push(Entry{index, digit: digit + 1});
+            entries.push(Entry {
+                index,
+                digit: digit + 1,
+            });
         }
         if let Some(index) = line.rfind(string) {
-            entries.push(Entry{index, digit: digit + 1});
+            entries.push(Entry {
+                index,
+                digit: digit + 1,
+            });
         }
     }
     entries
 }
 
 fn get_first_digit(entries: &[Entry]) -> usize {
-    entries.iter().min_by_key(|e| e.index).expect("no digits for this line").digit
+    entries
+        .iter()
+        .min_by_key(|e| e.index)
+        .expect("no digits for this line")
+        .digit
 }
 
 fn get_last_digit(entries: &[Entry]) -> usize {
-    entries.iter().max_by_key(|e| e.index).expect("no digits for this line").digit
+    entries
+        .iter()
+        .max_by_key(|e| e.index)
+        .expect("no digits for this line")
+        .digit
 }
