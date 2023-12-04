@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 #[derive(Debug)]
 pub struct ScratchCard {
+    pub number: u8,
     winning_numbers: Vec<u8>,
     own_numbers: Vec<u8>,
 }
@@ -13,15 +14,18 @@ impl FromStr for ScratchCard {
     type Err = ParseScratchCardError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (winning_numbers, own_numbers) = s
-            .split_once(':')
-            .map(|tuple| tuple.1)
-            .and_then(|card| card.split_once('|'))
+        let (number, numbers) = s
+            .strip_prefix("Card")
+            .and_then(|s| s.split_once(':'))
             .ok_or(ParseScratchCardError)?;
+        let (winning_numbers, own_numbers) = numbers.split_once('|').ok_or(ParseScratchCardError)?;
 
+        let number = number.trim().parse().map_err(|_| ParseScratchCardError)?;
         let winning_numbers = Self::get_numbers(winning_numbers)?;
         let own_numbers = Self::get_numbers(own_numbers)?;
+
         Ok(ScratchCard {
+            number,
             winning_numbers,
             own_numbers,
         })
@@ -48,5 +52,9 @@ impl ScratchCard {
                 acc
             }
         })
+    }
+
+    pub fn count_winning_numbers(&self) -> u8 {
+        self.own_numbers.iter().filter(|number| self.winning_numbers.contains(number)).count() as u8
     }
 }
