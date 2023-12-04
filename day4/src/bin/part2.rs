@@ -15,9 +15,9 @@ fn main() {
         let winning_numbers = card.count_winning_numbers();
         let times = copies.get(&card.number).unwrap_or(&0) + 1;
         total_cards += times;
-        let new_numbers = (card.number + 1)..=(card.number + winning_numbers);
+        let new_copies = (card.number + 1)..=(card.number + winning_numbers);
         for _ in 0..times {
-            for new_copy in new_numbers.clone() {
+            for new_copy in new_copies.clone() {
                 *copies.entry(new_copy).or_default() += 1
             }
         }
