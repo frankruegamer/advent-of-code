@@ -1,34 +1,17 @@
-use day5::MappingSet;
+use day5::{get_min_location, MappingSet, Seeds};
 
 const INPUT: &str = include_str!("../../input");
 
 fn main() {
     let mut blocks = INPUT.split("\n\n");
-    let seeds: Vec<usize> = blocks
-        .next()
-        .unwrap()
-        .strip_prefix("seeds: ")
-        .expect("no prefix")
-        .split_whitespace()
-        .map(|seed| seed.parse())
-        .collect::<Result<_, _>>()
-        .unwrap();
+    let seeds = blocks.next().unwrap().parse::<Seeds>().unwrap().seeds;
 
     let mapping_sets: Vec<MappingSet> = blocks
         .map(|block| block.parse())
         .collect::<Result<_, _>>()
         .unwrap();
 
-    let min_location = seeds
-        .iter()
-        .map(|seed| {
-            let location = mapping_sets
-                .iter()
-                .fold(*seed, |acc, set| set.get_destination_value(acc));
-            location
-        })
-        .min()
-        .unwrap();
+    let min_location = get_min_location(&seeds, &mapping_sets);
 
     println!("Result: {}", min_location);
 }

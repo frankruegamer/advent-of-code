@@ -2,13 +2,33 @@ use std::ops::Range;
 use std::str::FromStr;
 
 #[derive(Debug)]
-pub struct MappingSet {
-    _name: String,
-    mappings: Vec<Mapping>,
+pub struct Seeds {
+    pub seeds: Vec<usize>,
 }
 
 #[derive(Debug)]
 pub struct ParseMappingError;
+
+impl FromStr for Seeds {
+    type Err = ParseMappingError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let seeds = s.strip_prefix("seeds: ").ok_or(ParseMappingError)?;
+        let seeds = seeds
+            .split_whitespace()
+            .map(|seed| seed.parse())
+            .collect::<Result<_, _>>()
+            .map_err(|_| ParseMappingError)?;
+
+        Ok(Self { seeds })
+    }
+}
+
+#[derive(Debug)]
+pub struct MappingSet {
+    _name: String,
+    mappings: Vec<Mapping>,
+}
 
 impl FromStr for MappingSet {
     type Err = ParseMappingError;
@@ -80,10 +100,24 @@ impl Mapping {
     }
 }
 
+pub fn get_min_location(seeds: &[usize], mapping_sets: &[MappingSet]) -> usize {
+    seeds
+        .iter()
+        .map(|seed| {
+            let location = mapping_sets
+                .iter()
+                .fold(*seed, |acc, set| set.get_destination_value(acc));
+            location
+        })
+        .min()
+        .unwrap()
+}
+
 #[cfg(test)]
 mod test {
-    use crate::{Mapping, MappingSet};
     use std::collections::HashMap;
+
+    use crate::{Mapping, MappingSet};
 
     #[test]
     fn test() {
