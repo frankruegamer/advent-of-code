@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::ops::Range;
 use std::str::FromStr;
 
@@ -13,7 +14,7 @@ impl FromStr for Seeds {
     type Err = ParseMappingError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let seeds = s.strip_prefix("seeds: ").ok_or(ParseMappingError)?;
+        let seeds = s.strip_prefix("seeds: ").unwrap_or(s);
         let seeds = seeds
             .split_whitespace()
             .map(|seed| seed.parse())
@@ -21,6 +22,14 @@ impl FromStr for Seeds {
             .map_err(|_| ParseMappingError)?;
 
         Ok(Self { seeds })
+    }
+}
+
+impl Seeds {
+    pub fn iter_ranges(&self) -> impl Iterator<Item = usize> + '_ {
+        self.seeds
+            .chunks(2)
+            .flat_map(|chunk| chunk[0]..(chunk[0] + chunk[1]))
     }
 }
 
@@ -48,11 +57,12 @@ impl FromStr for MappingSet {
 
 impl MappingSet {
     pub fn get_destination_value(&self, source: usize) -> usize {
-        self.mappings
-            .iter()
-            .filter_map(|mapping| mapping.get_destination_value(source))
-            .next()
-            .unwrap_or(source)
+        for mapping in &self.mappings {
+            if let Some(destination) = mapping.get_destination_value(source) {
+                return destination;
+            }
+        }
+        source
     }
 }
 
@@ -100,10 +110,14 @@ impl Mapping {
     }
 }
 
-pub fn get_min_location(seeds: &[usize], mapping_sets: &[MappingSet]) -> usize {
+pub fn get_min_location(
+    seeds: impl IntoIterator<Item = impl Borrow<usize>>,
+    mapping_sets: &[MappingSet],
+) -> usize {
     seeds
-        .iter()
+        .into_iter()
         .map(|seed| {
+            let seed = seed.borrow();
             let location = mapping_sets
                 .iter()
                 .fold(*seed, |acc, set| set.get_destination_value(acc));
