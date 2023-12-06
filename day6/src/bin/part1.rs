@@ -15,20 +15,12 @@ impl FromStr for Races {
         let times = lines.next().ok_or(ParseRacesError)?;
         let distances = lines.next().ok_or(ParseRacesError)?;
 
-        let times = times
-            .strip_prefix("Time:")
-            .map(|line| line.split_whitespace())
-            .ok_or(ParseRacesError)?;
-        let distances = distances
-            .strip_prefix("Distance:")
-            .map(|line| line.split_whitespace())
-            .ok_or(ParseRacesError)?;
+        let times = Self::parse_line(times)?;
+        let distances = Self::parse_line(distances)?;
         let races = times
+            .into_iter()
             .zip(distances)
-            .map(|(time, distance)| Race {
-                time: time.parse().unwrap(),
-                distance: distance.parse().unwrap(),
-            })
+            .map(|(time, distance)| Race { time, distance })
             .collect();
 
         Ok(Races(races))
@@ -38,6 +30,18 @@ impl FromStr for Races {
 impl Races {
     fn multiply(&self) -> usize {
         self.0.iter().map(Race::solve).product()
+    }
+
+    fn parse_line(times: &str) -> Result<Vec<usize>, <Races as FromStr>::Err> {
+        let whitespace = times
+            .split_once(':')
+            .map(|(_, line)| line.split_whitespace())
+            .ok_or(ParseRacesError)?;
+        let vec: Vec<usize> = whitespace
+            .map(|number| number.parse())
+            .collect::<Result<_, _>>()
+            .map_err(|_| ParseRacesError)?;
+        Ok(vec)
     }
 }
 
