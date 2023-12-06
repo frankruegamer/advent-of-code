@@ -50,9 +50,14 @@ pub struct Race {
 
 impl Race {
     pub fn solve(&self) -> usize {
-        (1..self.time)
-            .map(|charging_time| charging_time * (self.time - charging_time))
-            .filter(|distance| *distance > self.distance)
-            .count()
+        let distance = |charging_time: usize| charging_time * (self.time - charging_time);
+
+        for charging_time in 1..self.time {
+            if distance(charging_time) > self.distance {
+                // solution is an inverse parabola in the middle of the available time
+                return self.time - (charging_time * 2 - 1);
+            }
+        }
+        panic!("no solution found");
     }
 }
