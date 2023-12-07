@@ -80,27 +80,20 @@ impl Hand {
 
         let joker_count = map.remove(&Card::J).unwrap_or(0);
 
-        if !Self::remove_any_with(&mut map, 5).is_empty() {
-            return HandType::FiveOfAKind;
+        if joker_count == 0 {
+            return self.hand_type();
         }
+
         if !Self::remove_any_with(&mut map, 4).is_empty() {
-            return match joker_count {
-                1 => HandType::FiveOfAKind,
-                _ => HandType::FourOfAKind,
-            };
+            // 1 joker
+            return HandType::FiveOfAKind;
         }
 
         if !Self::remove_any_with(&mut map, 3).is_empty() {
             return match joker_count {
                 2 => HandType::FiveOfAKind,
-                1 => HandType::FourOfAKind,
-                _ => {
-                    if !Self::remove_any_with(&mut map, 2).is_empty() {
-                        HandType::FullHouse
-                    } else {
-                        HandType::ThreeOfAKind
-                    }
-                }
+                // 1 joker
+                _ => HandType::FourOfAKind,
             };
         }
 
@@ -109,18 +102,12 @@ impl Hand {
             return match joker_count {
                 3 => HandType::FiveOfAKind,
                 2 => HandType::FourOfAKind,
-                1 => {
+                // 1 joker
+                _ => {
                     if twos.len() == 2 {
                         HandType::FullHouse
                     } else {
                         HandType::ThreeOfAKind
-                    }
-                }
-                _ => {
-                    if twos.len() == 2 {
-                        HandType::TwoPair
-                    } else {
-                        HandType::OnePair
                     }
                 }
             };
@@ -130,8 +117,8 @@ impl Hand {
             5 | 4 => HandType::FiveOfAKind,
             3 => HandType::FourOfAKind,
             2 => HandType::ThreeOfAKind,
-            1 => HandType::OnePair,
-            _ => HandType::HighCard,
+            // 1 joker
+            _ => HandType::OnePair,
         }
     }
 
