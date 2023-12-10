@@ -1,22 +1,9 @@
-use day8::{Direction, Directions, Fork};
-use std::collections::HashMap;
+use day8::Direction;
 
 const INPUT: &str = include_str!("../../input");
 
 fn main() {
-    let option = INPUT.split_once("\n\n");
-    let (first_line, lines) = option.unwrap();
-    let directions: Directions = first_line.parse().unwrap();
-    let lines = lines.lines();
-    let forks: Vec<_> = lines
-        .map(|line| line.parse::<Fork>())
-        .collect::<Result<_, _>>()
-        .unwrap();
-
-    let forks = forks.into_iter().fold(HashMap::new(), |mut map, fork| {
-        map.insert(fork.name.clone(), fork);
-        map
-    });
+    let (directions, forks) = day8::parse_input(INPUT);
 
     let mut current_node = "AAA";
     let mut count = 0;

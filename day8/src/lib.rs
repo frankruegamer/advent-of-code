@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::iter::Cycle;
 use std::slice::Iter;
 use std::str::FromStr;
@@ -67,4 +68,21 @@ impl FromStr for Fork {
         let right = parts.next().ok_or(ParseMovesErr)?.to_owned();
         Ok(Fork { name, left, right })
     }
+}
+
+pub fn parse_input(input: &str) -> (Directions, HashMap<String, Fork>) {
+    let option = input.split_once("\n\n");
+    let (first_line, lines) = option.unwrap();
+    let directions: Directions = first_line.parse().unwrap();
+    let lines = lines.lines();
+    let forks: Vec<_> = lines
+        .map(|line| line.parse::<Fork>())
+        .collect::<Result<_, _>>()
+        .unwrap();
+
+    let forks = forks.into_iter().fold(HashMap::new(), |mut map, fork| {
+        map.insert(fork.name.clone(), fork);
+        map
+    });
+    (directions, forks)
 }
