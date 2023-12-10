@@ -4,6 +4,51 @@ use std::slice::Iter;
 use std::str::FromStr;
 
 #[derive(Debug)]
+pub struct Map {
+    directions: Directions,
+    pub forks: HashMap<String, Fork>,
+}
+
+impl FromStr for Map {
+    type Err = ParseMovesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (first_line, lines) = s.split_once("\n\n").ok_or(ParseMovesErr)?;
+        let directions: Directions = first_line.parse()?;
+        let lines = lines.lines();
+        let forks: Vec<_> = lines
+            .map(|line| line.parse::<Fork>())
+            .collect::<Result<_, _>>()?;
+
+        let forks = forks.into_iter().fold(HashMap::new(), |mut map, fork| {
+            map.insert(fork.name.clone(), fork);
+            map
+        });
+
+        Ok(Self { directions, forks })
+    }
+}
+
+impl Map {
+    pub fn get_earliest_goal<F: Fn(&str) -> bool>(&self, start_key: &str, is_end_key: F) -> usize {
+        let mut current_node = start_key;
+        let mut count = 0;
+        for direction in self.directions.moves_iter().clone() {
+            let current_fork = self.forks.get(current_node).unwrap();
+            current_node = match direction {
+                Direction::Left => &current_fork.left,
+                Direction::Right => &current_fork.right,
+            };
+            count += 1;
+            if is_end_key(current_node) {
+                break;
+            }
+        }
+        count
+    }
+}
+
+#[derive(Debug)]
 pub struct Directions {
     directions: Vec<Direction>,
 }
