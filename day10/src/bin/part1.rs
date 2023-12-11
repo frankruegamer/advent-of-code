@@ -99,13 +99,15 @@ impl Direction {
 }
 
 fn main() {
-    // grid is transposed, so that grid[y][x]
-    let grid: Grid = INPUT
-        .lines()
-        .map(|line| line.chars().collect::<Vec<char>>().try_into().unwrap())
-        .collect::<Vec<[char; SIZE]>>()
-        .try_into()
-        .unwrap();
+    let grid = {
+        let mut grid: Grid = [['.'; SIZE]; SIZE];
+        for (y, line) in INPUT.lines().enumerate() {
+            for (x, char) in line.chars().enumerate() {
+                grid[x][y] = char;
+            }
+        }
+        grid
+    };
 
     let mut counter: usize = 0;
     let starting_pos = find_starting_pos(&grid);
@@ -128,9 +130,8 @@ fn main() {
 }
 
 fn find_starting_pos(grid: &Grid) -> Position {
-    // important y is the other value
-    for (y, row) in grid.iter().enumerate() {
-        for (x, char) in row.iter().enumerate() {
+    for (x, row) in grid.iter().enumerate() {
+        for (y, char) in row.iter().enumerate() {
             if Symbol::from(*char) == Symbol::StartingPosition {
                 return Position {
                     pos: (x, y),
@@ -187,7 +188,7 @@ fn position_in_direction(
     direction: Direction,
 ) -> Option<Position> {
     let (x, y) = (from_position + direction.clone())?;
-    let symbol = grid[y][x].into();
+    let symbol = grid[x][y].into();
     Some(Position {
         pos: (x, y),
         symbol,
